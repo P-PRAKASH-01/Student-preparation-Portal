@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="PrepHub - Student-focused skill preparation portal for pre-internship and pre-job readiness. Track companies, analyze skill gaps, and prepare effectively.">
+    <meta name="keywords"
+        content="student internship, job preparation, skill gap analysis, career preparation, skill tracking">
+    <title>PrepHub - Master Your Career Preparation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <div class="logo-icon">P</div>
+                <span>PrepHub</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link active" data-view="dashboard">📊 Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-view="companies">🏢 Companies</a></li>
+                <li><a href="#" class="nav-link" data-view="skills">🎯 Skill Gap</a></li>
+                <li><a href="#" class="nav-link" data-view="progress">📈 Progress</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-container">
+            <h1>Master Your Career Preparation</h1>
+            <p>Track companies, identify skill gaps, and prepare effectively for your dream internship or job. Your
+                personalized preparation dashboard.</p>
+            <button class="hero-cta" id="getStartedBtn">
+                <span>Get Started</span>
+                <span>→</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="main-container">
+
+        <!-- Dashboard View (Default) -->
+        <div id="dashboardView" class="view-container">
+            <div class="section-header">
+                <h2 class="section-title">Your Preparation Overview</h2>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-value" id="totalCompanies"></div>
+                    <div class="stat-label">Companies Tracked</div>
+                </div>
+
+                <div class="stat-card secondary">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value" id="favoriteCount"></div>
+                    <div class="stat-label">Favorites</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="skillsNeeded"></div>
+                    <div class="stat-label">Skills to Master</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-value" id="overallProgress"></div>
+                    <div class="stat-label">Overall Progress</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+
+            <div class="companies-grid">
+                <div class="company-card" id="addCompanyCard"
+                    style="border: 2px dashed var(--color-border); display: flex; align-items: center; justify-content: center; min-height: 200px; cursor: pointer;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">➕</div>
+                        <h3 style="color: var(--color-text-secondary);">Add New Company</h3>
+                    </div>
+                </div>
+
+                <div class="company-card" onclick="switchView('skills')"
+                    style="background: var(--gradient-primary); border: none;">
+                    <div style="text-align: center; padding: 2rem 0;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                        <h3>Analyze Skill Gaps</h3>
+                        <p style="color: rgba(255,255,255,0.8); margin-top: 0.5rem;">Identify what you need to learn</p>
+                    </div>
+                </div>
+
+                <div class="company-card" onclick="switchView('progress')"
+                    style="background: var(--gradient-success); border: none;">
+                    <div style="text-align: center; padding: 2rem 0;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                        <h3>Track Progress</h3>
+                        <p style="color: rgba(255,255,255,0.8); margin-top: 0.5rem;">Monitor your preparation journey
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favorite Companies -->
+            <div id="favoritesSection" class="hidden">
+                <div class="section-header" style="margin-top: 3rem;">
+                    <h2 class="section-title">⭐ Your Favorites</h2>
+                </div>
+                <div id="favoritesGrid" class="companies-grid"></div>
+            </div>
+        </div>
+
+        <!-- Companies View -->
+        <div id="companiesView" class="view-container hidden">
+            <div class="section-header">
+                <h2 class="section-title">Companies & Roles</h2>
+                <button class="btn btn-primary" id="addCompanyBtn">
+                    <span>➕</span>
+                    <span>Add Company</span>
+                </button>
+            </div>
+
+            <div id="companiesGrid" class="companies-grid">
+                <!-- Companies will be rendered here -->
+            </div>
+
+            <div id="emptyCompanies" class="empty-state">
+                <div class="empty-icon">🏢</div>
+                <h3>No Companies Tracked Yet</h3>
+                <p>Start by adding companies you're interested in to track their requirements and prepare effectively.
+                </p>
+                <button class="btn btn-primary" onclick="showAddCompanyModal()">
+                    <span>➕</span>
+                    <span>Add Your First Company</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Company Detail View -->
+        <div id="companyDetailView" class="view-container hidden">
+            <!-- Company detail content will be rendered here dynamically -->
+        </div>
+
+        <!-- Skill Gap Analysis View -->
+        <div id="skillsView" class="view-container hidden">
+            <div class="section-header">
+                <h2 class="section-title">Skill Gap Analysis</h2>
+                <button class="btn btn-secondary" onclick="switchView('dashboard')">
+                    <span>←</span>
+                    <span>Back to Dashboard</span>
+                </button>
+            </div>
+
+            <div id="gapAnalysisContainer">
+                <!-- Gap analysis will be rendered here -->
+            </div>
+
+            <div id="emptySkills" class="empty-state">
+                <div class="empty-icon">🎯</div>
+                <h3>No Skill Data Available</h3>
+                <p>Add companies and define your current skills to see your skill gap analysis.</p>
+            </div>
+        </div>
+
+        <!-- Progress Tracking View -->
+        <div id="progressView" class="view-container hidden">
+            <div class="section-header">
+                <h2 class="section-title">Your Progress</h2>
+                <button class="btn btn-secondary" onclick="switchView('dashboard')">
+                    <span>←</span>
+                    <span>Back to Dashboard</span>
+                </button>
+            </div>
+
+            <div id="progressContainer" class="progress-list">
+                <!-- Progress items will be rendered here -->
+            </div>
+
+            <div id="emptyProgress" class="empty-state">
+                <div class="empty-icon">📈</div>
+                <h3>Start Your Preparation Journey</h3>
+                <p>As you add companies and work on skills, your progress will be tracked here.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Add Company Modal (will be created dynamically) -->
+    <div id="modalOverlay" class="hidden"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+        <div id="modalContent"
+            style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: 2rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+            <!-- Modal content will be inserted here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
