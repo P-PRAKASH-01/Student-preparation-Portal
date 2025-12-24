@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // GitHub Pages SPA redirect: send all 404s back to index.html
+        // Preserve the original path as a query parameter
+        const path = window.location.pathname.replace(/^\/[^\/]+/, ''); // Remove repo name from path
+        window.location.replace('/Student-preparation-Portal/index.html?redirect=' + encodeURIComponent(path));
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
