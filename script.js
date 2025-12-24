@@ -861,7 +861,6 @@ function showSettingsModal() {
   const content = document.getElementById('modalContent');
 
   const storageInfo = getStorageInfo();
-  const isInstallable = deferredPrompt !== null;
 
   content.innerHTML = `
     <div style="margin-bottom: var(--spacing-lg);">
@@ -882,18 +881,19 @@ function showSettingsModal() {
         </div>
       ` : ''}
       
-      ${isInstallable ? `
-        <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
-          <h3 style="font-size: 1.125rem; margin-bottom: var(--spacing-md); color: var(--color-success);">📱 Install as App</h3>
-          <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md); font-size: 0.875rem;">
-            Install PrepHub on your device for quick access and offline use. Works like a native app!
-          </p>
-          <button class="btn btn-primary" id="installBtnModal" onclick="handleInstallClick();" style="background: var(--gradient-success);">
-            <span>📱</span>
-            <span>Install PrepHub</span>
-          </button>
-        </div>
-      ` : ''}
+      <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
+        <h3 style="font-size: 1.125rem; margin-bottom: var(--spacing-md); color: var(--color-success);">📱 Install as App</h3>
+        <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md); font-size: 0.875rem;">
+          Install PrepHub on your device for quick access and offline use. Works like a native app!
+        </p>
+        <button class="btn btn-primary" id="installBtnModal" onclick="handleInstallClick();" style="background: var(--gradient-success);" ${deferredPrompt ? '' : 'disabled'}>
+          <span>📱</span>
+          <span>Install PrepHub</span>
+        </button>
+        ${!deferredPrompt ? `
+          <div style="color: var(--color-text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">Install not available yet — the browser will prompt when installability criteria are met.</div>
+        ` : ''}
+      </div>
       
       <div style="background: var(--color-bg-tertiary); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
         <h3 style="font-size: 1.125rem; margin-bottom: var(--spacing-md);">💾 Data Management</h3>
@@ -959,6 +959,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   // Install button is now in settings modal, no need to show navbar button
+  // Enable install button in settings modal if it's present
+  try {
+    const installBtn = document.getElementById('installBtnModal');
+    if (installBtn) {
+      installBtn.disabled = false;
+      installBtn.removeAttribute('disabled');
+    }
+  } catch (err) {
+    // ignore if DOM not ready
+  }
 });
 
 // Handle install button click
@@ -990,6 +1000,16 @@ window.addEventListener('appinstalled', () => {
   console.log('[PWA] App was installed');
   showNotification('PrepHub installed! You can now use it offline.', 'success');
   deferredPrompt = null;
+  // Disable install button if present
+  try {
+    const installBtn = document.getElementById('installBtnModal');
+    if (installBtn) {
+      installBtn.disabled = true;
+      installBtn.setAttribute('disabled', '');
+    }
+  } catch (err) {
+    // ignore
+  }
 });
 
 // ===================================
