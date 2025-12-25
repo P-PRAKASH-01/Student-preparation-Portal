@@ -1018,19 +1018,27 @@ window.addEventListener('appinstalled', () => {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js', { scope: './' })
+    navigator.serviceWorker
+      .register('./service-worker.js', { scope: './' })
       .then((registration) => {
-        console.log('[PWA] Service Worker registered successfully:', registration.scope);
+        console.log('[PWA] Service Worker registered:', registration.scope);
 
-        // Check for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           console.log('[PWA] New Service Worker found');
 
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            if (
+              newWorker.state === 'installed' &&
+              navigator.serviceWorker.controller
+            ) {
               console.log('[PWA] New version available');
-              showNotification('App update available! Refresh to get the latest version.', 'info');
+
+              // Activate new service worker immediately
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+
+              // Reload to apply update
+              window.location.reload();
             }
           });
         });
@@ -1133,33 +1141,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-// ===============================
-// Stats Carousel Logic (SAFE)
-// ===============================
-document.addEventListener('DOMContentLoaded', () => {
+  // ===============================
+  // Stats Carousel Logic (SAFE)
+  // ===============================
+  document.addEventListener('DOMContentLoaded', () => {
 
-  const statsCarousel = document.getElementById('statsCarousel');
-  const dashes = document.querySelectorAll('.carousel-dots .dash');
+    const statsCarousel = document.getElementById('statsCarousel');
+    const dashes = document.querySelectorAll('.carousel-dots .dash');
 
-  // Exit safely if dashboard not loaded
-  if (!statsCarousel || dashes.length === 0) return;
+    // Exit safely if dashboard not loaded
+    if (!statsCarousel || dashes.length === 0) return;
 
-  function goToSlide(index) {
-    const width = statsCarousel.clientWidth;
-    statsCarousel.scrollTo({
-      left: width * index,
-      behavior: 'smooth'
+    function goToSlide(index) {
+      const width = statsCarousel.clientWidth;
+      statsCarousel.scrollTo({
+        left: width * index,
+        behavior: 'smooth'
+      });
+
+      dashes.forEach(d => d.classList.remove('active'));
+      dashes[index].classList.add('active');
+    }
+
+    dashes.forEach((dash, index) => {
+      dash.addEventListener('click', () => goToSlide(index));
     });
 
-    dashes.forEach(d => d.classList.remove('active'));
-    dashes[index].classList.add('active');
-  }
-
-  dashes.forEach((dash, index) => {
-    dash.addEventListener('click', () => goToSlide(index));
   });
-
-});
 
 
 
@@ -1171,3 +1179,8 @@ document.addEventListener('DOMContentLoaded', () => {
     saveToLocalStorage();
   }, 30000);
 });
+
+// ----------------------------------
+// Service Worker auto-update handler
+// ----------------------------------
+
