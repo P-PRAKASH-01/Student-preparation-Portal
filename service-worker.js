@@ -1,11 +1,13 @@
 // ===================================
-// PrepHub Service Worker (FIXED)
-// Prevents stale cache issues on GitHub Pages
+// PrepHub Service Worker (STABLE)
+// Auto-updates + No stale cache issues
+// Works perfectly on GitHub Pages
 // ===================================
 
-const CACHE_VERSION = 'v1.1'; // 🔥 bump this when needed
+const CACHE_VERSION = 'v1.2'; // 🔥 bump on major updates
 const CACHE_NAME = `prephub-${CACHE_VERSION}`;
 
+// Files that must be cached
 const STATIC_CACHE_URLS = [
   './',
   './index.html',
@@ -18,10 +20,12 @@ const STATIC_CACHE_URLS = [
 
 // ---------------- INSTALL ----------------
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  self.skipWaiting(); // activate immediately
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_CACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_CACHE_URLS);
+    })
   );
 });
 
@@ -36,7 +40,7 @@ self.addEventListener('activate', (event) => {
           }
         })
       )
-    ).then(() => self.clients.claim())
+    ).then(() => self.clients.claim()) // take control instantly
   );
 });
 
@@ -44,18 +48,21 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
 
-  // Skip cross-origin
+  // Ignore non-GET requests
+  if (request.method !== 'GET') return;
+
+  // Ignore cross-origin requests
   if (!request.url.startsWith(self.location.origin)) return;
 
-  // 🔥 NETWORK FIRST for HTML (prevents stale UI)
+  // 🌐 NETWORK FIRST for HTML navigation
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) =>
-            cache.put('./index.html', copy)
-          );
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put('./index.html', copy);
+          });
           return response;
         })
         .catch(() => caches.match('./index.html'))
@@ -63,20 +70,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ⚡ CACHE FIRST for assets
+  // ⚡ CACHE FIRST for static assets (CSS, JS, icons)
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
 
-      return fetch(request).then((response) => {
-        if (response.status === 200) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) =>
-            cache.put(request, copy)
-          );
-        }
-        return response;
-      });
+      return fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, copy);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Optional: fallback if needed later
+        });
     })
   );
 });

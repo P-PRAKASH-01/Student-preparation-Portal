@@ -212,6 +212,7 @@ body::before {
   justify-content: center;
   position: relative;
   z-index: 99999; /* ensure hamburger button sits above dropdown */
+  overflow: visible; /* allow transformed lines to extend without being clipped */
   transform: translateZ(0); /* create new layer to avoid stacking bugs */
 }
 
@@ -227,7 +228,7 @@ body::before {
 }
 
 .hamburger.active .hamburger-line:nth-child(1) {
-  transform: rotate(45deg) translate(8px, 8px);
+  transform: rotate(45deg) translate(6px, 6px);
 }
 
 .hamburger.active .hamburger-line:nth-child(2) {
@@ -235,7 +236,7 @@ body::before {
 }
 
 .hamburger.active .hamburger-line:nth-child(3) {
-  transform: rotate(-45deg) translate(8px, -8px);
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* ===================================
@@ -1062,6 +1063,7 @@ body::before {
     /* ensure hamburger sits above the dropdown when transformed to X */
     position: relative;
     z-index: 99999; /* higher to be above dropdown and other elements */
+    overflow: visible; /* prevent clipping when transformed to X */
   }
 
   /* Nav Links - Hide by default, show when active */
@@ -1291,6 +1293,7 @@ body::before {
     order: 2;
     position: relative;
     z-index: 99999; /* ensure X icon appears above dropdown */
+    overflow: visible; /* allow X mark to render fully */
   }
 
   /* Nav Links - Mobile dropdown */

@@ -470,7 +470,7 @@ function viewCompanyDetail(companyId) {
         >${company.notes || ''}</textarea>
         <div class="notes-meta">
           <span id="notesSaveStatus">All changes saved</span>
-          <span>${company.notes ? company.notes.length : 0} characters</span>
+          <span id="notesCharCount">${company.notes ? company.notes.length : 0} characters</span>
         </div>
       </div>
       
@@ -687,6 +687,12 @@ function autoSaveNotes(companyId) {
     const notesTextarea = document.getElementById('companyNotes');
     company.notes = notesTextarea.value;
     saveToLocalStorage();
+    
+    // Update character count immediately
+    const charCountDisplay = document.getElementById('notesCharCount');
+    if (charCountDisplay) {
+        charCountDisplay.textContent = `${company.notes.length} characters`;
+    }
 
     // Show save status
     const status = document.getElementById('notesSaveStatus');
@@ -1135,22 +1141,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Close modal on overlay click
-  document.getElementById('modalOverlay').addEventListener('click', (e) => {
-    if (e.target.id === 'modalOverlay') {
-      closeModal();
-    }
-  });
+  const modalOverlay = document.getElementById('modalOverlay');
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target.id === 'modalOverlay') {
+        closeModal();
+      }
+    });
+  }
 
   // ===============================
-  // Stats Carousel Logic (SAFE)
+  // Stats Carousel Logic (FIXED)
   // ===============================
-  document.addEventListener('DOMContentLoaded', () => {
+  const statsCarousel = document.getElementById('statsCarousel');
+  const dashes = document.querySelectorAll('.carousel-dots .dash');
 
-    const statsCarousel = document.getElementById('statsCarousel');
-    const dashes = document.querySelectorAll('.carousel-dots .dash');
-
-    // Exit safely if dashboard not loaded
-    if (!statsCarousel || dashes.length === 0) return;
+  // Exit safely if dashboard not loaded
+  if (statsCarousel && dashes.length > 0) {
 
     function goToSlide(index) {
       const width = statsCarousel.clientWidth;
@@ -1166,8 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dashes.forEach((dash, index) => {
       dash.addEventListener('click', () => goToSlide(index));
     });
-
-  });
+  }
 
 
 
@@ -1183,4 +1189,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // ----------------------------------
 // Service Worker auto-update handler
 // ----------------------------------
-
+if ('serviceWorker' in navigator) {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      window.location.reload();
+      refreshing = true;
+    }
+  });
+}
