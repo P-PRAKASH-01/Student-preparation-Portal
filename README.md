@@ -62,7 +62,7 @@ Typical workflow:
 - Settings modal with storage information and install prompt support
 
 
-### 6) Version 1.1 is Coming Soon
+### 6) Version 1.2 is Came 🔥✌️
 
 
 
